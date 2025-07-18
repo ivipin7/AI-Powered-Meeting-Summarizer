@@ -1,0 +1,8 @@
+# 1. Activate virtual environment
+.venv\Scripts\Activate.ps1
+
+# 2. Make sure Ollama is running (if not already)
+ollama serve
+
+# 3. Run the application
+python main.py

@@ -2,153 +2,77 @@
 
 ## Overview
 
-The **AI-Powered Meeting Summarizer** is a Gradio-powered application that converts audio recordings of meetings into transcripts and provides concise summaries using `whisper.cpp` for audio-to-text conversion and `Ollama` for text summarization. This tool is ideal for quickly extracting key points, decisions, and action items from meetings.
+This project is an AI-powered meeting summarizer web application. It allows users to upload audio files of meetings, transcribes the audio using OpenAI Whisper, summarizes the transcript using Llama (or other LLMs), and provides downloadable summaries and transcripts in both text and PDF formats. All user and meeting data is stored in MongoDB (compatible with MongoDB Compass for easy management).
 
-<img width="1512" alt="Screenshot 2024-10-01 at 10 05 32 PM" src="https://github.com/user-attachments/assets/5b93cfed-c853-4ebb-8d90-bbda58354192">
-
-
-https://github.com/user-attachments/assets/2f1de19d-0feb-4a35-a6ab-f9be8dabf512
-
-
-
+---
 
 ## Features
 
-- **Audio-to-Text Conversion**: Uses `whisper.cpp` to convert audio files into text.
-- **Text Summarization**: Uses models from the `Ollama` server to summarize the transcript.
-- **Multiple Models Support**: Supports different Whisper models (`base`, `small`, `medium`, `large-V3`) and any available model from the Ollama server.
-- **Translation**: Allows translation of non-English audio to English using Whisper.
-- **Gradio Interface**: Provides a user-friendly web interface to upload audio files, view summaries, and download transcripts.
+- **Modern Web UI**: Built with FastAPI and Jinja2 templates, styled with Bootstrap for a responsive, user-friendly experience.
+- **User Authentication**: Secure sign up, sign in, logout, and profile management (CRUD) with password hashing and JWT authentication.
+- **Audio Summarization**: Upload audio files in most common formats (WAV, MP3, OGG, M4A, etc.).
+- **Multi-language Transcription**: Whisper supports nearly 100 languages for transcription.
+- **English Summarization**: Llama model provides best results for English transcripts.
+- **Download Options**: Download both summary and transcript as text or PDF.
+- **History Page**: View all previous meeting summaries and transcripts, with download options for each.
+- **MongoDB Storage**: All data is stored in a local MongoDB database, viewable and manageable with MongoDB Compass.
 
-## Requirements
+---
 
-- Python 3.x
-- [FFmpeg](https://www.ffmpeg.org/) (for audio processing)
-- [Whisper.cpp](https://github.com/ggerganov/whisper.cpp) (for audio-to-text conversion)
-- [Ollama server](https://ollama.com/) (for text summarization)
-- [Gradio](https://www.gradio.app/) (for the web interface)
-- [Requests](https://requests.readthedocs.io/en/latest/) (for handling API calls to the Ollama server)
+## Setup Instructions
 
-## Pre-Installation
+### 1. Prerequisites
+- Python 3.8+
+- MongoDB installed and running locally (default: `mongodb://localhost:27017/`)
+- FFmpeg installed (for audio processing)
+- (Optional) MongoDB Compass for GUI database management
 
-Before running the application, ensure you have Ollama that is running on your local machine or a server. You can follow the instructions provided in the [Ollama repository](https://github.com/ollama/ollama) to set up the server. Do not forget to download and run a model from the Ollama server.
-
+### 2. Install Dependencies
 ```bash
-# To install and run Llama 3.2
-ollama run llama3.2
+pip install -r requirements.txt
 ```
 
-## Installation
-
-Follow the steps below to set up and run the application:
-
-### Step 1: Clone the Repository
-
+### 3. Run the App
 ```bash
-git clone https://github.com/AlexisBalayre/AI-Powered-Meeting-Summarizer
-cd AI-Powered-Meeting-Summarizer
+uvicorn main:app --reload
 ```
+Visit [http://localhost:8000/](http://localhost:8000/) in your browser.
 
-### Step 2: Run the Setup Script
+### 4. Using the App
+- **Sign Up / Sign In**: Create an account or log in.
+- **Summarize**: Upload an audio file, select models, and get your summary and transcript.
+- **Download**: Use the dropdowns to download summary or transcript as text or PDF.
+- **History**: View all your previous meeting summaries and transcripts on the History page.
+- **Profile**: Update your user info or delete your account.
 
-To install all necessary dependencies (including Python virtual environment, `whisper.cpp`, FFmpeg, and Python packages), and to run the application, execute the provided setup script:
+---
 
-```bash
-chmod +x run_meeting_summarizer.sh
-./run_meeting_summarizer.sh
-```
+## Project Structure
+- `main.py` - FastAPI app, routes, and business logic
+- `database_manager.py` - MongoDB integration and data management
+- `templates/` - Jinja2 HTML templates for UI
+- `static/` - Static assets (CSS, JS, etc.)
+- `uploads/` - Uploaded audio files (temporary)
+- `requirements.txt` - Python dependencies
 
-This script will:
+---
 
-- Create and activate a Python virtual environment.
-- Install necessary Python packages like `requests` and `gradio`.
-- Check if `FFmpeg` is installed and install it if missing.
-- Clone and build `whisper.cpp`.
-- Download the required Whisper model (default: `small`).
-- **Run the `main.py` script**, which will start the Gradio interface for the application.
+## Notes
+- **Audio Input**: Most common audio formats are supported. FFmpeg is used to convert files as needed.
+- **Transcription Language**: Whisper can transcribe nearly any language, but summarization is best in English.
+- **Database**: All data is stored in the `meeting_summarizer` database, `transcription_history` collection.
+- **Security**: Passwords are hashed, and JWT is used for authentication.
+- **PDF Generation**: Summaries and transcripts can be downloaded as well-formatted PDFs.
 
-### Step 3: Accessing the Application
+---
 
-Once the setup and execution are complete, Gradio will provide a URL (typically `http://127.0.0.1:7860`). Open this URL in your web browser to access the Meeting Summarizer interface.
+## Future Improvements
+- Add support for multi-language summarization (with translation step)
+- Add admin dashboard and analytics
+- Add user roles and permissions
+- Deploy to cloud (Heroku, AWS, etc.)
 
-Alternatively, after setup, you can activate the virtual environment and run the Python script manually:
-
-```bash
-# Activate the virtual environment
-source .venv/bin/activate
-
-# Run the main.py script
-python main.py
-```
-
-## Usage
-
-### Uploading an Audio File
-
-1. **Upload an Audio File**: Click on the audio upload area and select an audio file in any supported format (e.g., `.wav`, `.mp3`).
-2. **Provide Context (Optional)**: You can provide additional context for better summarization (e.g., "Meeting about AI and Ethics").
-3. **Select Whisper Model**: Choose one of the available Whisper models (`base`, `small`, `medium`, `large-V3`) for audio-to-text conversion.
-4. **Select Summarization Model**: Choose a model from the available options retrieved from the `Ollama` server.
-
-### Viewing Results
-
-- After uploading an audio file, you will get a **Summary** of the transcript generated by the selected models.
-- You can also **download the full transcript** as a text file by clicking the provided link.
-
-## Customization
-
-### Changing the Whisper Model
-
-By default, the Whisper model used is `small`. You can modify this in the `run_meeting_summarizer.sh` script by changing the `WHISPER_MODEL` variable:
-
-```bash
-WHISPER_MODEL="medium"
-```
-
-Alternatively, you can select different Whisper models from the dropdown in the Gradio interface. The list of available models is dynamically generated based on the `.bin` files found in the `whisper.cpp/models` directory.
-
-### Downloading Additional Whisper Models
-
-To download a different Whisper model (e.g., `base`, `medium`, `large`), use the following steps:
-
-1. Navigate to the `whisper.cpp` directory:
-
-   ```bash
-   cd whisper.cpp
-   ```
-
-2. Use the provided script to download the desired model. For example, to download the `base` model, run:
-
-   ```bash
-   ./models/download-ggml-model.sh base
-   ```
-
-   For the `large` model, you can run:
-
-   ```bash
-   ./models/download-ggml-model.sh large
-   ```
-
-   This will download the `.bin` file into the `whisper.cpp/models` directory.
-
-3. Once downloaded, the new model will automatically be available in the model dropdown when you restart the application.
-
-### Configuring Translation
-
-By default, Whisper will detect the language of the audio file and translate it to English if necessary. This behavior is controlled by the `-l` flag in the `whisper.cpp` command.
-
-```bash
-./whisper.cpp/main -m ./whisper.cpp/models/ggml-{WHISPER_MODEL}.bin -l fr -f "{audio_file_wav}"
-```
-
-This flag tells Whisper to translate the audio into French regardless of the original language.
+---
 
 ## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Acknowledgements
-
-- **whisper.cpp** by Georgi Gerganov for the audio-to-text conversion.
-- **Gradio** for the interactive web interface framework.
-- **Ollama** for providing large language models for summarization.
+See [LICENSE](LICENSE) for details.
